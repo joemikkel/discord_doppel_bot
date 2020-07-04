@@ -159,7 +159,7 @@ class Bot(object):
         fake_context=fake_context.replace("UTOKEN", header)
         
         data = {
-            "prompt": {"text": fakecontext + context + header},
+            "prompt": {"text": fake_context + context + header},
             "length": 250,
             "topP": 0.8,
             "temperature": 0.95,
