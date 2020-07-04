@@ -77,7 +77,7 @@ class Bot(object):
                 print("\t this is a message from me, ignoring...")
                 return
             # check if I've been mentioned
-            if f"<@!{self.discord_id}>" in message.content:
+            if f"{self.discord_id}" in message.content:
                 print("\tI've been mentioned!")
                 await self.reply(message)
             # otherwise reply depending on channel
