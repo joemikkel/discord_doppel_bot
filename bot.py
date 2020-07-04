@@ -12,10 +12,10 @@ import requests
 class Bot(object):
     def __init__(self, username, config_path=None):
         """
-		username: name of user to be immitated (e.g. joemikkel)
-		config_path: specify path to config file if not default
-					 default is <username>.conf, e.g. joemikkel.conf
-		"""
+        username: name of user to be immitated (e.g. joemikkel)
+        config_path: specify path to config file if not default
+                     default is <username>.conf, e.g. joemikkel.conf
+        """
         # ingest config
         self.username = username
         if config_path:
@@ -30,8 +30,8 @@ class Bot(object):
 
     def __str__(self):
         """
-		make string repr for debugging
-		"""
+        make string repr for debugging
+        """
         values = {
             "username": self.username,
             "token": self.token,
@@ -43,8 +43,8 @@ class Bot(object):
 
     def _import_config(self):
         """
-		loads values from config file into class
-		"""
+        loads values from config file into class
+        """
         if not os.path.exists(self.config_path):
             raise Exception(f"The config file was not found: {self.config_path}")
         config = configparser.ConfigParser()
@@ -59,8 +59,8 @@ class Bot(object):
 
     def run(self):
         """
-		starts bot service
-		"""
+        starts bot service
+        """
         # do this when the bot comes online
         @self.client.event
         async def on_ready():
@@ -90,8 +90,8 @@ class Bot(object):
 
     async def reply(self, message):
         """
-		creates and posts a reply to a given message 
-		"""
+        creates and posts a reply to a given message 
+        """
         reply = await self.make_reply(message)
         message_sent = False  # keep track of whether we've replied at all
         for a_message in reply:
@@ -158,8 +158,8 @@ class Bot(object):
 
     async def make_reply(self, message):
         """
-		generates a reply to the message from the NN
-		"""
+        generates a reply to the message from the NN
+        """
         # get properly formatted message history
         print("I've decided to reply")
         messages = await self.get_message_history(message)
