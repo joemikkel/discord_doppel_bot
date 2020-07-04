@@ -153,14 +153,15 @@ class Bot(object):
         # these are the config options to sample the model
         access_token = self.inferkit_token
         stop_sequence = ">"
-        #create some fake context to bias the net towards more reasonable responses
-        fake_1="> Ovid\nWhat color are apples?\nUTOKEN\nRed usually, sometimes green.\n"
-        fake_2="> Kollo\nWhat's the capital of France?\nUTOKEN\nParis, I think\n"
-        fake_3="> Arganouva\nWhat's 23+19?\nUTOKEN\n42!\n"
-        fake_4="> Acromyrmex\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
-        fake_context=fake_1+fake_2+fake_3+fake_4
-        fake_context=fake_context.replace("UTOKEN", header)
-        
+        # create some fake context to bias the net towards more reasonable responses
+        fake_1 = (
+            "> Ovid\nWhat color are apples?\nUTOKEN\nRed usually, sometimes green.\n"
+        )
+        fake_2 = "> Kollo\nWhat's the capital of France?\nUTOKEN\nParis, I think\n"
+        fake_3 = "> Arganouva\nWhat's 23+19?\nUTOKEN\n42!\n"
+        fake_4 = "> Acromyrmex\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
+        fake_context = fake_1 + fake_2 + fake_3 + fake_4
+        fake_context = fake_context.replace("UTOKEN", header)
         data = {
             "prompt": {"text": fake_context + context + header},
             "length": 250,
@@ -173,13 +174,17 @@ class Bot(object):
         for retry in range(0, 3):
             response = requests.post(self.inferkit_url, json=data, headers=headers)
             if response.status_code not in [200, 201]:
-                print("Failed to reach inferkit, retrying in 1 to 5 seconds")
+                print(
+                    f"Failed to reach inferkit with status code {response.status_code}, retrying in 1 to 5 seconds"
+                )
                 time.sleep(random.randint(1, 5))
             else:
                 responded = True
                 break
         if not responded:
-            return [f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "]
+            return [
+                f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "
+            ]
         textOutput = response.json()["data"]["text"]
         print("Receiving text output from the net:")
         print(textOutput)
