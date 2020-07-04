@@ -49,6 +49,8 @@ class Bot(object):
 		self.regular_chance = float(config['behavior']['interjection_chance'])
 		self.prison_chance = float(config['behavior']['prison_interjection_chance'])
 		self.history_length = int(config['behavior']['history_length'])
+		self.inferkit_token = config['inferkit']['access_token']
+		self.inferkit_url = config['inferkit']['url']
 		return
 
 	def run(self):
@@ -71,19 +73,29 @@ class Bot(object):
 				return
 			# check if I've been mentioned
 			if f"<@!{self.discord_id}>" in message.content:
-				reply = await self.make_reply(message)
-				await message.channel.send(reply)
+				await self.reply(message)
 			# otherwise reply depending on channel
 			if str(message.channel) == 'robot-prison':
 				if random.random() < self.prison_chance:
-					reply = await self.make_reply(message)
-					await message.channel.send(reply)
+					await self.reply(message)
 			else:
 				if random.random() < self.regular_chance:
-					reply = await self.make_reply(message)
-					await message.channel.send(reply)
+					await self.reply(message)
 
 		self.client.run(self.token)
+
+	async def reply(self, message):
+		reply = await self.make_reply(message)
+		message_sent = False
+		for a_message in reply:
+			print(f"sending a message: {a_message}")
+			if a_message.isspace() or a_message == "":
+				continue
+			else:
+				await message.channel.send(a_message)
+				message_sent = True
+		if not message_sent:
+			message.channel.send("_I don't want to reply to that._")
 
 	async def get_message_history(self, message):
 		messages = []
@@ -92,26 +104,69 @@ class Bot(object):
 		return messages
 
 	def format_message_history(self, messages):
-		#extract usernames and messages
+		# extract usernames and messages
 		formatted_messages = []
 		for message in messages:
 			author = message.author.name
 			content = message.content
-
 			formatted_messages.append(f'>{author}\n{content}\n')
 		return '\n'.join(formatted_messages)
 
+	def sample_model(self, context, header):
+	    #these are the config options to sample the model
+	    access_token = self.inferkit_token
+	    stop_sequence = ">"
+	    json = {
+	      "prompt": {
+	        "text": context + header
+	      },
+	      "length": 500
+	    }
+	    #make the actual request
+	    headers = {"Authorization" : "Bearer " + access_token}
+	    response = requests.post(self.inferkit_url, json=json, headers=headers)
+	    textOutput= response.json()['data']['text']
+	    lines = textOutput.split("\n")
+	    output_lines =[]
+	    currentmessage=""
+	    stop = False
+	    for line in lines:
+	        if not stop:
+	            if not stop_sequence in line:
+	               currentmessage = currentmessage+line+"\n"
+	            else:
+	                if header.rstrip("\n") in line:
+	                    output_lines.append(currentmessage)
+	                    currentmessage=""
+	                else:
+	                    stop=True
+	    output_lines.append(currentmessage)
+	    #output line now contains a list of things to post as discord messages
+	    return output_lines
 
 	async def make_reply(self, message):
 		"""
 		generates a reply
 		"""
-		#get message history
+		# get properly formatted message history
+		print("I've decided to reply")
 		messages = await self.get_message_history(message)
 		messages.reverse()
 		formatted_messages = self.format_message_history(messages)
-		print("Making a reply")
-		return f"Thanks for mentioning me! here's a history:\n{formatted_messages}"
+		# get user who made request
+		author = f"> {message.author.name}"
+		# talk to inferkit
+		print(" >>> Sampling model <<< ")
+		print(f"Header: {author}")
+		print(f"Context:\n---\n {formatted_messages}\n---\n")
+		results = self.sample_model(formatted_messages, author)
+		print(" >>> Results from nnet <<< ")
+		print(results)
+		return results
+
+		
+		
+
 
 
 
