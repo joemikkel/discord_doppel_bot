@@ -113,15 +113,30 @@ class Bot(object):
             messages.append(message)
         return messages
 
-    def clean_message_history(self, messages):
+    def clean_message_history(self, messages, username):
+        # create list of bad statements
+        badstatements = [
+            "Can't reach inferkit. Got back a 400",
+            "I don't want to reply to that.",
+            "---IMAGE---",
+            "---URL---",
+            "---TWEET---",
+        ]
         # extract usernames and messages into a string digestible by NN
         formatted_messages = []
         for message in messages:
             # get the author
             author = message.author.name
-            # treat bot messages as if they were from the original user
-            author = author.lstrip("robot_")
+            # make the bot think its own messages were sent by its persona
+            # and that any messages sent by the actual user it's doppeling
+            # were sent by a stranger
+            author = author.replace("robot_" + username, "robot_placeholder")
+            author = author.replace(username, "TheStranger")
+            author = author.replace("robot_placeholder", username)
             content = message.content
+            # remove empty statements likely to cause repetitive behavior
+            for badstatement in badstatements:
+                content = content.replace(badstatement, "")
             # format the message so it can be digested by NN
             formatted_messages.append(f"> {author}\n{content}\n")
         # put all messages into one big string for NN
