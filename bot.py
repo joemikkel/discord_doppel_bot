@@ -15,7 +15,6 @@ class Bot(object):
 		config_path: specify path to config file if not default
 					 default is <username>.conf, e.g. joemikkel.conf
 		"""
-
 		# ingest config
 		self.username = username
 		if config_path:
