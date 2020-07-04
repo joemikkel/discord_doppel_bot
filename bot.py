@@ -150,9 +150,17 @@ class Bot(object):
         # these are the config options to sample the model
         access_token = self.inferkit_token
         stop_sequence = ">"
+        #create some fake context to bias the net towards more reasonable responses
+        fake_1="> Ovid\nWhat color are apples?\nUTOKEN\nRed usually, sometimes green.\n"
+        fake_2="> Kollo\nWhat's the capital of France?\nUTOKEN\nParis, I think\n"
+        fake_3="> Arganouva\nWhat's 23+19?\nUTOKEN\n42!\n"
+        fake_4="> Acromyrmex\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
+        fake_context=fake_1+fake_2+fake3+fake_4
+        fake_context=fake_context.replace("UTOKEN", header)
+        
         data = {
-            "prompt": {"text": context + header},
-            "length": 500,
+            "prompt": {"text": fakecontext + context + header},
+            "length": 250,
             "topP": 0.8,
             "temperature": 0.95,
         }
