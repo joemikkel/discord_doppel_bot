@@ -124,6 +124,11 @@ class Bot(object):
             "---TWEET---",
             "---VIDEO---",
         ]
+        badsubstrings = [
+            "reach inferkit",
+            "-IMAGE-",
+            "-URL-",
+        ]
         # extract usernames and messages into a string digestible by NN
         formatted_messages = []
         for message in messages:
@@ -141,6 +146,9 @@ class Bot(object):
             # remove empty statements likely to cause repetitive behavior
             for badstatement in badstatements:
                 content = content.replace(badstatement, "")
+            for badsubstring in badsubstrings:
+                if badsubstring in content:
+                    content = ""
             # format the message so it can be digested by NN
             if len(content) > 2:
                 formatted_messages.append(f"> {author}\n{content}\n")
