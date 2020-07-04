@@ -4,6 +4,7 @@ import pprint
 import os
 import random
 import asyncio
+import time
 
 import discord
 import requests
@@ -166,8 +167,15 @@ class Bot(object):
         }
         # make the actual request
         headers = {"Authorization": "Bearer " + access_token}
-        response = requests.post(self.inferkit_url, json=data, headers=headers)
-        if response.status_code not in [200, 201]:
+        response = None
+        for retry in range(0, 3):
+            response = requests.post(self.inferkit_url, json=data, headers=headers)
+            if response.status_code not in [200, 201]:
+                print("Failed to reach inferkit, retrying in 1 to 5 seconds")
+                time.sleep(random.randint(1, 5))
+            else:
+                break
+        if response is None:
             return [f"_Can't reach inferkit. Got back a {response.status_code}_"]
         textOutput = response.json()["data"]["text"]
         print("Receiving text output from the net:")
