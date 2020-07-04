@@ -155,7 +155,7 @@ class Bot(object):
         fake_2="> Kollo\nWhat's the capital of France?\nUTOKEN\nParis, I think\n"
         fake_3="> Arganouva\nWhat's 23+19?\nUTOKEN\n42!\n"
         fake_4="> Acromyrmex\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
-        fake_context=fake_1+fake_2+fake3+fake_4
+        fake_context=fake_1+fake_2+fake_3+fake_4
         fake_context=fake_context.replace("UTOKEN", header)
         
         data = {
