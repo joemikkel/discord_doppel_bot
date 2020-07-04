@@ -28,6 +28,9 @@ class Bot(object):
 		self.discord_id = None
 
 	def __str__(self):
+		"""
+		make string repr for debugging
+		"""
 		values = {
 			"username" : self.username,
 			"token" : self.token,
@@ -39,7 +42,9 @@ class Bot(object):
 
 
 	def _import_config(self):
-
+		"""
+		loads values from config file into class
+		"""
 		if not os.path.exists(self.config_path):
 			raise Exception(f"The config file was not found: {self.config_path}")
 		config = configparser.ConfigParser()
@@ -84,8 +89,11 @@ class Bot(object):
 		self.client.run(self.token)
 
 	async def reply(self, message):
+		"""
+		creates and posts a reply to a given message 
+		"""
 		reply = await self.make_reply(message)
-		message_sent = False
+		message_sent = False #keep track of whether we've replied at all
 		for a_message in reply:
 			print(f"sending a message: {a_message}")
 			if a_message.isspace() or a_message == "":
@@ -97,13 +105,14 @@ class Bot(object):
 			message.channel.send("_I don't want to reply to that._")
 
 	async def get_message_history(self, message):
+		# gets last X messages from channel history where message was posted
 		messages = []
 		async for message in message.channel.history(limit=self.history_length):
 			messages.append(message)
 		return messages
 
 	def format_message_history(self, messages):
-		# extract usernames and messages
+		# extract usernames and messages into a string digestible by NN
 		formatted_messages = []
 		for message in messages:
 			author = message.author.name
@@ -112,6 +121,8 @@ class Bot(object):
 		return '\n'.join(formatted_messages)
 
 	def sample_model(self, context, header):
+		# talks to the NN to get a reply
+
 	    #these are the config options to sample the model
 	    access_token = self.inferkit_token
 	    stop_sequence = ">"
@@ -145,7 +156,7 @@ class Bot(object):
 
 	async def make_reply(self, message):
 		"""
-		generates a reply
+		generates a reply to the message from the NN
 		"""
 		# get properly formatted message history
 		print("I've decided to reply")
