@@ -102,7 +102,7 @@ class Bot(object):
                 await message.channel.send(a_message)
                 message_sent = True
         if not message_sent:
-            message.channel.send("_I don't want to reply to that._")
+            await message.channel.send("_I don't want to reply to that._")
 
     async def get_message_history(self, message):
         # gets last X messages from channel history where message was posted
