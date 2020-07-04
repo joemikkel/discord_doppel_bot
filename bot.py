@@ -178,8 +178,7 @@ class Bot(object):
         print(" >>> Sampling model <<< ")
         print(f"Header: {author}")
         print(f"Context:\n---\n {formatted_messages}\n---\n")
-        results = ['I am a test message please ignore', 'I am also a test message']
-        # results = self.sample_model(formatted_messages, author)
+        results = self.sample_model(formatted_messages, author)
         print(" >>> Results from nnet <<< ")
         print(results)
         return results
