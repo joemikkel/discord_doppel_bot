@@ -172,11 +172,12 @@ class Bot(object):
             response = requests.post(self.inferkit_url, json=data, headers=headers)
             if response.status_code not in [200, 201]:
                 print("Failed to reach inferkit, retrying in 1 to 5 seconds")
+                response = None
                 time.sleep(random.randint(1, 5))
             else:
                 break
         if response is None:
-            return [f"_Can't reach inferkit. Got back a {response.status_code}_"]
+            return [f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "]
         textOutput = response.json()["data"]["text"]
         print("Receiving text output from the net:")
         print(textOutput)
