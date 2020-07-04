@@ -121,6 +121,7 @@ class Bot(object):
             "---IMAGE---",
             "---URL---",
             "---TWEET---",
+            "---VIDEO---",
         ]
         # extract usernames and messages into a string digestible by NN
         formatted_messages = []
@@ -138,7 +139,8 @@ class Bot(object):
             for badstatement in badstatements:
                 content = content.replace(badstatement, "")
             # format the message so it can be digested by NN
-            formatted_messages.append(f"> {author}\n{content}\n")
+            if(len(content>2):
+                formatted_messages.append(f"> {author}\n{content}\n")
         # put all messages into one big string for NN
         return "\n".join(formatted_messages)
 
@@ -160,6 +162,8 @@ class Bot(object):
         if response.status_code not in [200, 201]:
             return [f"_Can't reach inferkit. Got back a {response.status_code}_"]
         textOutput = response.json()["data"]["text"]
+        print("Receiving text output from the net:")
+        print(textOutput)
         lines = textOutput.split("\n")
         output_lines = []
         currentmessage = ""
