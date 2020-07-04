@@ -16,12 +16,13 @@ class Bot(object):
         config_path: specify path to config file if not default
                      default is <username>.conf, e.g. joemikkel.conf
         """
+        print("Starting...")
         # ingest config
         self.username = username
         if config_path:
             self.config_path = config_path
         else:
-            self.config_path = "./" + self.username + ".conf"
+            self.config_path = "./bot.conf"
         self._import_config()
 
         # set up discord stuff
@@ -49,7 +50,7 @@ class Bot(object):
             raise Exception(f"The config file was not found: {self.config_path}")
         config = configparser.ConfigParser()
         config.read(self.config_path)
-        self.token = config["auth"]["token"]
+        self.token = config["auth"][self.username]
         self.regular_chance = float(config["behavior"]["interjection_chance"])
         self.prison_chance = float(config["behavior"]["prison_interjection_chance"])
         self.history_length = int(config["behavior"]["history_length"])
@@ -70,13 +71,14 @@ class Bot(object):
         # do this when the bot sees a message posted somewhere
         @self.client.event
         async def on_message(message):
-            print(f"saw message from {message.author}")
+            print(f"saw message from {message.author}:\n {message.content}")
             # don't reply to myself
             if message.author == self.client.user:
                 print("\t this is a message from me, ignoring...")
                 return
             # check if I've been mentioned
             if f"<@!{self.discord_id}>" in message.content:
+                print("\tI've been mentioned!")
                 await self.reply(message)
             # otherwise reply depending on channel
             if str(message.channel) == "robot-prison":
@@ -131,12 +133,17 @@ class Bot(object):
         # these are the config options to sample the model
         access_token = self.inferkit_token
         stop_sequence = ">"
-        json = {"prompt": {"text": context + header}, "length": 500}
+        data = {
+            "prompt": {"text": context + header},
+            "length": 500,
+            "topP": 0.8,
+            "temperature": 0.95,
+        }
         # make the actual request
         headers = {"Authorization": "Bearer " + access_token}
-        response = requests.post(self.inferkit_url, json=json, headers=headers)
+        response = requests.post(self.inferkit_url, json=data, headers=headers)
         if response.status_code not in [200, 201]:
-            return [f"Can't reach inferkit. Got back a {response.status_code}"]
+            return [f"_Can't reach inferkit. Got back a {response.status_code}_"]
         textOutput = response.json()["data"]["text"]
         lines = textOutput.split("\n")
         output_lines = []

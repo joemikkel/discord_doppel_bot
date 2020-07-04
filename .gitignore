@@ -130,3 +130,5 @@ dmypy.json
 
 # config
 joemikkel.conf
+bot.conf
+
