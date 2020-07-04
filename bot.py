@@ -166,7 +166,7 @@ class Bot(object):
         messages.reverse()
         formatted_messages = self.clean_message_history(messages)
         # get user who made request
-        author = f"> {message.author.name}"
+        author = f"> {self.username}"
         # talk to inferkit
         print(" >>> Sampling model <<< ")
         print(f"Header: {author}")
