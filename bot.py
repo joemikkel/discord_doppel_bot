@@ -88,6 +88,10 @@ class Bot(object):
 
 		self.client.run(self.token)
 
+	
+
+
+
 	async def reply(self, message):
 		"""
 		creates and posts a reply to a given message 
@@ -111,13 +115,18 @@ class Bot(object):
 			messages.append(message)
 		return messages
 
-	def format_message_history(self, messages):
+	def clean_message_history(self, messages):
 		# extract usernames and messages into a string digestible by NN
 		formatted_messages = []
 		for message in messages:
+			# get the author
 			author = message.author.name
+			# treat bot messages as if they were from the original user
+			author = author.lstrip("robot_")
 			content = message.content
-			formatted_messages.append(f'>{author}\n{content}\n')
+			# format the message so it can be digested by NN
+			formatted_messages.append(f'> {author}\n{content}\n')
+		# put all messages into one big string for NN
 		return '\n'.join(formatted_messages)
 
 	def sample_model(self, context, header):
@@ -135,6 +144,8 @@ class Bot(object):
 	    #make the actual request
 	    headers = {"Authorization" : "Bearer " + access_token}
 	    response = requests.post(self.inferkit_url, json=json, headers=headers)
+	    if response.status_code not in [200, 201]:
+	    	return [f"Can't reach inferkit. Got back a {response.status_code}"]
 	    textOutput= response.json()['data']['text']
 	    lines = textOutput.split("\n")
 	    output_lines =[]
@@ -162,7 +173,7 @@ class Bot(object):
 		print("I've decided to reply")
 		messages = await self.get_message_history(message)
 		messages.reverse()
-		formatted_messages = self.format_message_history(messages)
+		formatted_messages = self.clean_message_history(messages)
 		# get user who made request
 		author = f"> {message.author.name}"
 		# talk to inferkit
