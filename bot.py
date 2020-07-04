@@ -136,6 +136,8 @@ class Bot(object):
             author = author.replace(username, "TheStranger")
             author = author.replace("robot_placeholder", username)
             content = message.content
+            if content == "--IMAGE--":
+                content = "https://picsum.photos/200/200"
             # remove empty statements likely to cause repetitive behavior
             for badstatement in badstatements:
                 content = content.replace(badstatement, "")
