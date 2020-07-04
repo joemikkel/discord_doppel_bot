@@ -186,7 +186,7 @@ class Bot(object):
         print("I've decided to reply")
         messages = await self.get_message_history(message)
         messages.reverse()
-        formatted_messages = self.clean_message_history(messages)
+        formatted_messages = self.clean_message_history(messages, self.username)
         # get user who made request
         author = f"> {self.username}"
         # talk to inferkit
