@@ -102,6 +102,8 @@ class Bot(object):
             if a_message.isspace() or a_message == "":
                 continue
             else:
+                if "-IMAGE-" in a_message:
+                    a_message = "https://picsum.photos/200/200"
                 await message.channel.send(a_message)
                 message_sent = True
         if not message_sent:
