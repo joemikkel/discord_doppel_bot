@@ -171,8 +171,8 @@ class Bot(object):
         fake_context = fake_context.replace("UTOKEN", header)
 
         full_init_vector= fake_context + context + header
-        if len(full_init_vector) > 999:
-           full_init_vector = full_init_vector[-999:]
+        if len(full_init_vector) > 998:
+           full_init_vector = full_init_vector[-998:]
         data = {
             "prompt": {"text": full_init_vector},
             "length": 250,
