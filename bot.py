@@ -5,6 +5,7 @@ import os
 import random
 import asyncio
 import time
+import logging
 
 import discord
 import requests
@@ -17,15 +18,15 @@ class Bot(object):
         config_path: specify path to config file if not default
                      default is <username>.conf, e.g. joemikkel.conf
         """
-        print("Starting...")
         # ingest config
         self.username = username
         if config_path:
             self.config_path = config_path
         else:
             self.config_path = "./bot.conf"
+        # set up logging
+        logging.basicConfig(filename=f"{self.username}.log", level=logging.DEBUG)
         self._import_config()
-
         # set up discord stuff
         self.client = discord.Client()
         self.discord_id = None
@@ -67,19 +68,19 @@ class Bot(object):
         @self.client.event
         async def on_ready():
             self.discord_id = self.client.user.id
-            print(f"Running as user {self.client.user}, ID: {self.discord_id}")
+            logging.info(f"Running as user {self.client.user}, ID: {self.discord_id}")
 
         # do this when the bot sees a message posted somewhere
         @self.client.event
         async def on_message(message):
-            print(f"saw message from {message.author}:\n {message.content}")
+            logging.info(f"saw message from {message.author}:\n {message.content}")
             # don't reply to myself
             if message.author == self.client.user:
-                print("\t this is a message from me, ignoring...")
+                logging.info("\t this is a message from me, ignoring...")
                 return
             # check if I've been mentioned
             if f"{self.discord_id}" in message.content:
-                print("\tI've been mentioned!")
+                logging.info("\tI've been mentioned!")
                 await self.reply(message)
             # otherwise reply depending on channel
             if str(message.channel) == "robot-prison":
@@ -98,7 +99,7 @@ class Bot(object):
         reply = await self.make_reply(message)
         message_sent = False  # keep track of whether we've replied at all
         for a_message in reply:
-            print(f"sending a message: {a_message}")
+            logging.info(f"sending a message: {a_message}")
             if a_message.isspace() or a_message == "":
                 continue
             else:
@@ -182,7 +183,7 @@ class Bot(object):
         for retry in range(0, 3):
             response = requests.post(self.inferkit_url, json=data, headers=headers)
             if response.status_code not in [200, 201]:
-                print(
+                logging.warning(
                     f"Failed to reach inferkit with status code {response.status_code}, retrying in 1 to 5 seconds"
                 )
                 time.sleep(random.randint(1, 5))
@@ -190,12 +191,12 @@ class Bot(object):
                 responded = True
                 break
         if not responded:
-            return [
-                f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "
-            ]
+            no_response_message = f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "
+            logging.error(no_response_message)
+            return [no_response_message]
         textOutput = response.json()["data"]["text"]
-        print("Receiving text output from the net:")
-        print(textOutput)
+        logging.info("Receiving text output from the net:")
+        logging.info(textOutput)
         lines = textOutput.split("\n")
         output_lines = []
         currentmessage = ""
@@ -219,17 +220,17 @@ class Bot(object):
         generates a reply to the message from the NN
         """
         # get properly formatted message history
-        print("I've decided to reply")
+        logging.info("I've decided to reply")
         messages = await self.get_message_history(message)
         messages.reverse()
         formatted_messages = self.clean_message_history(messages, self.username)
         # get user who made request
         author = f"> {self.username}"
         # talk to inferkit
-        print(" >>> Sampling model <<< ")
-        print(f"Header: {author}")
-        print(f"Context:\n---\n {formatted_messages}\n---\n")
+        logging.info(" >>> Sampling model <<< ")
+        logging.info(f"Header: {author}")
+        logging.info(f"Context:\n---\n {formatted_messages}\n---\n")
         results = self.sample_model(formatted_messages, author)
-        print(" >>> Results from nnet <<< ")
-        print(results)
+        logging.info(" >>> Results from nnet <<< ")
+        logging.info(results)
         return results
