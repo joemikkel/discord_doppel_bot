@@ -25,7 +25,10 @@ class Bot(object):
         else:
             self.config_path = "./bot.conf"
         # set up logging
-        logging.basicConfig(filename=f"{self.username}.log", level=logging.INFO)
+        logging.basicConfig(
+            filename=f"{self.username}.log", 
+            level=logging.INFO,
+            format=f"%(levelname)s:{self.username}:%(message)s")
         self._import_config()
         # set up discord stuff
         self.client = discord.Client()
