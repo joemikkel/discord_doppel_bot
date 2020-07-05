@@ -5,7 +5,6 @@ import os
 import random
 import asyncio
 import time
-import logging
 
 import discord
 import requests
@@ -18,18 +17,15 @@ class Bot(object):
         config_path: specify path to config file if not default
                      default is <username>.conf, e.g. joemikkel.conf
         """
+        print("Starting...")
         # ingest config
         self.username = username
         if config_path:
             self.config_path = config_path
         else:
             self.config_path = "./bot.conf"
-        # set up logging
-        logging.basicConfig(
-            filename=f"{self.username}.log", 
-            level=logging.INFO,
-            format=f"%(levelname)s:{self.username}:%(message)s")
         self._import_config()
+
         # set up discord stuff
         self.client = discord.Client()
         self.discord_id = None
@@ -71,19 +67,19 @@ class Bot(object):
         @self.client.event
         async def on_ready():
             self.discord_id = self.client.user.id
-            logging.info(f"Running as user {self.client.user}, ID: {self.discord_id}")
+            print(f"Running as user {self.client.user}, ID: {self.discord_id}")
 
         # do this when the bot sees a message posted somewhere
         @self.client.event
         async def on_message(message):
-            logging.info(f"saw message from {message.author}:\n {message.content}")
+            print(f"saw message from {message.author}:\n {message.content}")
             # don't reply to myself
             if message.author == self.client.user:
-                logging.info("\t this is a message from me, ignoring...")
+                print("\t this is a message from me, ignoring...")
                 return
             # check if I've been mentioned
             if f"{self.discord_id}" in message.content:
-                logging.info("\tI've been mentioned!")
+                print("\tI've been mentioned!")
                 await self.reply(message)
             # otherwise reply depending on channel
             if str(message.channel) == "robot-prison":
@@ -102,12 +98,10 @@ class Bot(object):
         reply = await self.make_reply(message)
         message_sent = False  # keep track of whether we've replied at all
         for a_message in reply:
-            logging.info(f"sending a message: {a_message}")
+            print(f"sending a message: {a_message}")
             if a_message.isspace() or a_message == "":
                 continue
             else:
-                if "-IMAGE-" in a_message:
-                    a_message = "https://picsum.photos/200/200"
                 await message.channel.send(a_message)
                 message_sent = True
         if not message_sent:
@@ -147,6 +141,8 @@ class Bot(object):
             author = author.replace(username, "TheStranger")
             author = author.replace("robot_placeholder", username)
             content = message.content
+            if content == "--IMAGE--":
+                content = "https://picsum.photos/200/200"
             # remove empty statements likely to cause repetitive behavior
             for badstatement in badstatements:
                 content = content.replace(badstatement, "")
@@ -166,16 +162,19 @@ class Bot(object):
         access_token = self.inferkit_token
         stop_sequence = ">"
         # create some fake context to bias the net towards more reasonable responses
-        fake_1 = (
-            "> Ovid\nWhat color are apples?\nUTOKEN\nRed usually, sometimes green.\n"
-        )
-        fake_2 = "> Kollo\nWhat's the capital of France?\nUTOKEN\nParis, I think\n"
-        fake_3 = "> Arganouva\nWhat's 23+19?\nUTOKEN\n42!\n"
-        fake_4 = "> Acromyrmex\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
-        fake_context = fake_1 + fake_2 + fake_3 + fake_4
+        fake_0 = "> Zack\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
+        fake_1 = "> Ezra\nWhat color are apples?\nUTOKEN\nRed usually, sometimes green.\n"
+        fake_2 = "> Rita\nWhat's the capital of France?\nUTOKEN\nParis, I think\n"
+        fake_3 = "> Kira\nWhat's 23+19?\nUTOKEN\n42!\n"
+        fake_4 = "> Dante\nWhat's your name?\nUTOKEN\n"+header.replace("> ", "")+"\n"
+        fake_context = fake_0 + fake_1 + fake_2 + fake_3 + fake_4
         fake_context = fake_context.replace("UTOKEN", header)
+
+        full_init_vector= fake_context + context + header
+        if len(full_init_vector) > 999:
+           full_init_vector = full_init_vector[-999:]
         data = {
-            "prompt": {"text": fake_context + context + header},
+            "prompt": {"text": full_init_vector},
             "length": 250,
             "topP": 0.8,
             "temperature": 0.95,
@@ -186,7 +185,7 @@ class Bot(object):
         for retry in range(0, 3):
             response = requests.post(self.inferkit_url, json=data, headers=headers)
             if response.status_code not in [200, 201]:
-                logging.warning(
+                print(
                     f"Failed to reach inferkit with status code {response.status_code}, retrying in 1 to 5 seconds"
                 )
                 time.sleep(random.randint(1, 5))
@@ -194,12 +193,12 @@ class Bot(object):
                 responded = True
                 break
         if not responded:
-            no_response_message = f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "
-            logging.error(no_response_message)
-            return [no_response_message]
+            return [
+                f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "
+            ]
         textOutput = response.json()["data"]["text"]
-        logging.info("Receiving text output from the net:")
-        logging.info(textOutput)
+        print("Receiving text output from the net:")
+        print(textOutput)
         lines = textOutput.split("\n")
         output_lines = []
         currentmessage = ""
@@ -223,17 +222,17 @@ class Bot(object):
         generates a reply to the message from the NN
         """
         # get properly formatted message history
-        logging.info("I've decided to reply")
+        print("I've decided to reply")
         messages = await self.get_message_history(message)
         messages.reverse()
         formatted_messages = self.clean_message_history(messages, self.username)
         # get user who made request
         author = f"> {self.username}"
         # talk to inferkit
-        logging.info(" >>> Sampling model <<< ")
-        logging.info(f"Header: {author}")
-        logging.info(f"Context:\n---\n {formatted_messages}\n---\n")
+        print(" >>> Sampling model <<< ")
+        print(f"Header: {author}")
+        print(f"Context:\n---\n {formatted_messages}\n---\n")
         results = self.sample_model(formatted_messages, author)
-        logging.info(" >>> Results from nnet <<< ")
-        logging.info(results)
+        print(" >>> Results from nnet <<< ")
+        print(results)
         return results
