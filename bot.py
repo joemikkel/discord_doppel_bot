@@ -95,16 +95,20 @@ class Bot(object):
         """
         creates and posts a reply to a given message 
         """
-        reply = await self.make_reply(message)
         message_sent = False  # keep track of whether we've replied at all
-        for a_message in reply:
-            print(f"sending a message: {a_message}")
-            if a_message.isspace() or a_message == "":
-                continue
-            else:
-                await message.channel.send(a_message)
-                message_sent = True
-        if not message_sent:
+        debugCtr = 0
+        while message_sent is False and debugCtr < 3:
+            reply = await self.make_reply(message)
+            for a_message in reply:
+                print(f"sending a message: {a_message}")
+                if a_message.isspace() or a_message == "":
+                    continue
+                else:
+                    await message.channel.send(a_message)
+                    message_sent = True
+            if not message_sent:
+                debugCtr = debugCtr + 1
+        if message_sent is False:
             await message.channel.send("_I don't want to reply to that._")
 
     async def get_message_history(self, message):
