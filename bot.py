@@ -177,7 +177,7 @@ class Bot(object):
         fake_7 = "> Kira\nWhat's 23+19?\nUTOKEN\n42!\n"
         fake_8 = "> Shannon\nWhat's your favorite color?\nUTOKEN\nRed!\n"
         fake_9 = "> Ethan\nWho wrote Huckleberry Finn?\nUTOKEN\nMark Twain, AKA Samuel Clemens.\n"
-        fact_list = {fake_0,fake_1,fake_2, fake_3, fake_4, fake_5, fake_6, fake_7, fake_8, fake_9}
+        fact_list = [fake_0,fake_1,fake_2, fake_3, fake_4, fake_5, fake_6, fake_7, fake_8, fake_9]
         random.shuffle(fact_list)
         fake_context = ''.join(fact_list)
         fake_context = fake_context.replace("UTOKEN", header)
