@@ -212,11 +212,11 @@ class Bot(object):
         print("Receiving text output from the net:")
         print(textOutput)
         lines = textOutput.split("\n")
+        #always remove the last line, because it may be only partially formed
         if len(lines) > 2:
             lines.pop()
         output_lines = []
-        #always remove the last line, because it may be only partially formed
-         currentmessage = ""
+        currentmessage = ""
         stop = False
         for line in lines:
             if not stop:
