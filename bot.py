@@ -174,10 +174,12 @@ class Bot(object):
         fake_4 = "> Dante\nWhat's your name?\nUTOKEN\n"+header.replace("> ", "")+"\n"
         fake_5 = "> Andre\nWho was the first man to walk on the moon?\nUTOKEN\nIt was Neil Armstrong, followed by Buzz Aldrin.\n"
         fake_6 = "> Ben\nWhat's a good name for a dog?\nUTOKEN\nSpot, or Killer.\n"
-        fake_7 = "> Kira\nWhat's 23+19?\nUTOKEN\n42!\n"
+        fake_7 = "> Kira\nWhat's the ocean made of?\nUTOKEN\nSalt water!\n"
         fake_8 = "> Shannon\nWhat's your favorite color?\nUTOKEN\nRed!\n"
         fake_9 = "> Ethan\nWho wrote Huckleberry Finn?\nUTOKEN\nMark Twain, AKA Samuel Clemens.\n"
-        fact_list = [fake_0,fake_1,fake_2, fake_3, fake_4, fake_5, fake_6, fake_7, fake_8, fake_9]
+        fake_10 = "> Zack\nAre you a good person?\nUTOKEN\nI try to be. It's hard sometimes.\n"
+        fake_11 = "> Ezra\nWhat country are you from?\nUTOKEN\nI'm from the US.\n"
+        fact_list = [fake_0,fake_1,fake_2, fake_3, fake_4, fake_5, fake_6, fake_7, fake_8, fake_9, fake_10, fake_11]
         random.shuffle(fact_list)
         fake_context = ''.join(fact_list)
         fake_context = fake_context.replace("UTOKEN", header)
