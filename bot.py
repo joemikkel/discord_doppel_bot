@@ -11,6 +11,7 @@ import requests
 
 
 class Bot(object):
+    sample_length = 300
     def __init__(self, username, config_path=None):
         """
         username: name of user to be immitated (e.g. joemikkel)
@@ -168,10 +169,17 @@ class Bot(object):
         # create some fake context to bias the net towards more reasonable responses
         fake_0 = "> Zack\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
         fake_1 = "> Ezra\nWhat color are apples?\nUTOKEN\nRed usually, sometimes green.\n"
-        fake_2 = "> Rita\nWhat's the capital of France?\nUTOKEN\nParis, I think\n"
+        fake_2 = "> Rita\nWhat's the capital of France?\nUTOKEN\nThe capital of France is Paris.\n"
         fake_3 = "> Kira\nWhat's 23+19?\nUTOKEN\n42!\n"
         fake_4 = "> Dante\nWhat's your name?\nUTOKEN\n"+header.replace("> ", "")+"\n"
-        fake_context = fake_0 + fake_1 + fake_2 + fake_3 + fake_4
+        fake_5 = "> Andre\nWho was the first man to walk on the moon?\nUTOKEN\nIt was Neil Armstrong, followed by Buzz Aldrin.\n"
+        fake_6 = "> Ben\nWhat's a good name for a dog?\nUTOKEN\nSpot, or Killer.\n"
+        fake_7 = "> Kira\nWhat's 23+19?\nUTOKEN\n42!\n"
+        fake_8 = "> Shannon\nWhat's your favorite color?\nUTOKEN\nRed!\n"
+        fake_9 = "> Ethan\nWho wrote Huckleberry Finn?\nUTOKEN\nMark Twain, AKA Samuel Clemens.\n"
+        fact_list = {fake_0,fake_1,fake_2, fake_3, fake_4, fake_5, fake_6, fake_7, fake_8, fake_9}
+        random.shuffle(fact_list)
+        fake_context = ''.join(fact_list)
         fake_context = fake_context.replace("UTOKEN", header)
 
         full_init_vector= fake_context + context + header
@@ -179,8 +187,8 @@ class Bot(object):
            full_init_vector = full_init_vector[-998:]
         data = {
             "prompt": {"text": full_init_vector},
-            "length": 250,
-            "topP": 0.8,
+            "length": sample_length,
+            "topP": 0.85,
             "temperature": 0.95,
         }
         # make the actual request
@@ -205,6 +213,8 @@ class Bot(object):
         print(textOutput)
         lines = textOutput.split("\n")
         output_lines = []
+        #always remove the last line, because it may be only partially formed
+        output_lines.pop()
         currentmessage = ""
         stop = False
         for line in lines:
