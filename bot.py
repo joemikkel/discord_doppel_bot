@@ -11,7 +11,6 @@ import requests
 
 
 class Bot(object):
-    sample_length = 300
     def __init__(self, username, config_path=None):
         """
         username: name of user to be immitated (e.g. joemikkel)
@@ -131,8 +130,9 @@ class Bot(object):
         ]
         badsubstrings = [
             "reach inferkit",
-            "-IMAGE-",
-            "-URL-",
+            "IMAGE",
+            "URL",
+            "TWEET",
         ]
         # extract usernames and messages into a string digestible by NN
         formatted_messages = []
@@ -146,7 +146,7 @@ class Bot(object):
             author = author.replace(username, "TheStranger")
             author = author.replace("robot_placeholder", username)
             content = message.content
-            if content == "--IMAGE--":
+            if "--IMAGE--" in content:
                 content = "https://picsum.photos/200/200"
             # remove empty statements likely to cause repetitive behavior
             for badstatement in badstatements:
@@ -187,7 +187,7 @@ class Bot(object):
            full_init_vector = full_init_vector[-998:]
         data = {
             "prompt": {"text": full_init_vector},
-            "length": sample_length,
+            "length": 300,
             "topP": 0.85,
             "temperature": 0.95,
         }
