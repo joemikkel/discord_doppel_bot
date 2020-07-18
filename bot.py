@@ -167,17 +167,17 @@ class Bot(object):
         access_token = self.inferkit_token
         stop_sequence = ">"
         # create some fake context to bias the net towards more reasonable responses
-        fake_0 = "> Zack\nWho was the first president of the US?\nUTOKEN\nGeorge Washington\n"
+        fake_0 = "> Zack\nHow would you describe yourself?\nUTOKEN\nI'm kind of a nerd.\n"
         fake_1 = "> Ezra\nWhat color are apples?\nUTOKEN\nRed usually, sometimes green.\n"
-        fake_2 = "> Rita\nWhat's the capital of France?\nUTOKEN\nThe capital of France is Paris.\n"
+        fake_2 = "> Rita\nhow many hands do you have?\nUTOKEN\nI have two hands.\n"
         fake_3 = "> Kira\nWhat's 23+19?\nUTOKEN\n42!\n"
         fake_4 = "> Dante\nWhat's your name?\nUTOKEN\n"+header.replace("> ", "")+"\n"
-        fake_5 = "> Andre\nWho was the first man to walk on the moon?\nUTOKEN\nIt was Neil Armstrong, followed by Buzz Aldrin.\n"
+        fake_5 = "> Andre\nHow old are you?\nUTOKEN\nI'm in my mid twenties.\n"
         fake_6 = "> Ben\nWhat's a good name for a dog?\nUTOKEN\nSpot, or Killer.\n"
         fake_7 = "> Kira\nWhat's the ocean made of?\nUTOKEN\nSalt water!\n"
         fake_8 = "> Shannon\nWhat's your favorite color?\nUTOKEN\nRed!\n"
-        fake_9 = "> Ethan\nWho wrote Huckleberry Finn?\nUTOKEN\nMark Twain, AKA Samuel Clemens.\n"
-        fake_10 = "> Zack\nAre you a good person?\nUTOKEN\nI try to be. It's hard sometimes.\n"
+        fake_9 = "> Ethan\nWhat do you do for fun?\nUTOKEN\nI spend a lot of time on the internet.\n"
+        fake_10 = "> Zack\nAre you a machine?\nUTOKEN\nI honestly don't know. I feel human, but that's what a robot *would* say.\n"
         fake_11 = "> Ezra\nWhat country are you from?\nUTOKEN\nI'm from the US.\n"
         fact_list = [fake_0,fake_1,fake_2, fake_3, fake_4, fake_5, fake_6, fake_7, fake_8, fake_9, fake_10, fake_11]
         random.shuffle(fact_list)
