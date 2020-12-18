@@ -6,6 +6,7 @@ import random
 import asyncio
 import time
 import subprocess
+import re
 
 import discord
 import requests
@@ -172,6 +173,7 @@ class Bot(object):
         print("Got this from the exe:\n---")
         print(out)
         print("---")
+        out = re.split("<@!.*\n", a)[-1]
         out = out.replace("\\n", "\n")
         out = out.replace("\\'", "'")
         out = out.split("time=")[0]
