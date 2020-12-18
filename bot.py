@@ -208,7 +208,7 @@ class Bot(object):
         if len(full_init_vector) > 998:
            full_init_vector = full_init_vector[-998:]
         
-        textOutput = self.sample_model(full_init_vector)
+        textOutput = self.execute_inference(full_init_vector)
         print(textOutput)
         lines = textOutput.split("\n")
         #always remove the last line, because it may be only partially formed
