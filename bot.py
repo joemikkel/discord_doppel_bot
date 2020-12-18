@@ -177,8 +177,8 @@ class Bot(object):
         out = out.split("time=")[0]
         if "<|endoftext|>" in out:
             out = out.split("<|endoftext|>")[0]
-        if out.startswith('b"') or out.startswith("b'"):
-            out = out[2:]
+        # if out.startswith('b"') or out.startswith("b'"):
+        #     out = out[2:]
         return out
 
     def sample_model(self, context, header):
