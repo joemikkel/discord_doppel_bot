@@ -169,11 +169,16 @@ class Bot(object):
         exe = '/root/minimal_generator/gpt2tc'
         command = [exe, '-m', '345M', 'g', str(context)]
         r = subprocess.run(command, stdout=subprocess.PIPE, cwd=os.path.split(exe)[0])
-        out = str(r.stdout)
+        out = r.stdout.decode('utf8')
         print("Got this from the exe:\n---")
         print(out)
         print("---")
-        out = re.split("<@!.*\\n", out)[-1]
+        split_text = bytes(context[-20:], "utf8").decode('utf8')
+        print("Split : " + split_text)
+        out = out.split(split_text)[-1]
+        print("---")
+        print(out)
+        print("---")
         out = out.replace("\\n", "\n")
         out = out.replace("\\'", "'")
         out = out.split("time=")[0]
