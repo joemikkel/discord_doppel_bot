@@ -5,6 +5,7 @@ import os
 import random
 import asyncio
 import time
+import subprocess
 
 import discord
 import requests
