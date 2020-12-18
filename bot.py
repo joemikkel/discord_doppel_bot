@@ -160,6 +160,26 @@ class Bot(object):
         # put all messages into one big string for NN
         return "\n".join(formatted_messages)
 
+    def execute_inference(context):
+        """
+        runs local executable to perform inference
+        """
+        exe = '/root/minimal_generator/gpt2tc'
+        command = [exe, '-m', '345M', 'g', str(context)]
+        r = subprocess.run(command, stdout=subprocess.PIPE, cwd=os.path.split(exe)[0])
+        out = str(r.stdout)
+        print("Got this from the exe:\n--------------")
+        print(out)
+        print("-------------")
+        out = out.replace("\\n", "\n")
+        out = out.replace("\\'", "'")
+        out = out.split("time=")[0]
+        if "<|endoftext|>" in out:
+            out = out.split("<|endoftext|>")[0]
+        if out.startswith('b"') or out.startswith("b'"):
+            out = out[2:]
+        return out
+
     def sample_model(self, context, header):
         # talks to the NN to get a reply
 
@@ -187,31 +207,8 @@ class Bot(object):
         full_init_vector= fake_context + context + header
         if len(full_init_vector) > 998:
            full_init_vector = full_init_vector[-998:]
-        data = {
-            "prompt": {"text": full_init_vector},
-            "length": 300,
-            "topP": 0.85,
-            "temperature": 0.95,
-        }
-        # make the actual request
-        headers = {"Authorization": "Bearer " + access_token}
-        responded = False
-        for retry in range(0, 3):
-            response = requests.post(self.inferkit_url, json=data, headers=headers)
-            if response.status_code not in [200, 201]:
-                print(
-                    f"Failed to reach inferkit with status code {response.status_code}, retrying in 1 to 5 seconds"
-                )
-                time.sleep(random.randint(1, 5))
-            else:
-                responded = True
-                break
-        if not responded:
-            return [
-                f"_Can't reach inferkit. Got back a {response.status_code} after 3 retries._ "
-            ]
-        textOutput = response.json()["data"]["text"]
-        print("Receiving text output from the net:")
+        
+        textOutput = sample_model(full_init_vector)
         print(textOutput)
         lines = textOutput.split("\n")
         #always remove the last line, because it may be only partially formed
