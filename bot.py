@@ -160,7 +160,7 @@ class Bot(object):
         # put all messages into one big string for NN
         return "\n".join(formatted_messages)
 
-    def execute_inference(context):
+    def execute_inference(self, context):
         """
         runs local executable to perform inference
         """
@@ -208,7 +208,7 @@ class Bot(object):
         if len(full_init_vector) > 998:
            full_init_vector = full_init_vector[-998:]
         
-        textOutput = sample_model(full_init_vector)
+        textOutput = self.sample_model(full_init_vector)
         print(textOutput)
         lines = textOutput.split("\n")
         #always remove the last line, because it may be only partially formed
