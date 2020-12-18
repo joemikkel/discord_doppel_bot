@@ -169,9 +169,9 @@ class Bot(object):
         command = [exe, '-m', '345M', 'g', str(context)]
         r = subprocess.run(command, stdout=subprocess.PIPE, cwd=os.path.split(exe)[0])
         out = str(r.stdout)
-        print("Got this from the exe:\n--------------")
+        print("Got this from the exe:\n---")
         print(out)
-        print("-------------")
+        print("---")
         out = out.replace("\\n", "\n")
         out = out.replace("\\'", "'")
         out = out.split("time=")[0]
@@ -210,7 +210,10 @@ class Bot(object):
            full_init_vector = full_init_vector[-998:]
         
         textOutput = self.execute_inference(full_init_vector)
+        print("This is the output from the inference function call:")
+        print("---")
         print(textOutput)
+        print("---")
         lines = textOutput.split("\n")
         #always remove the last line, because it may be only partially formed
         if len(lines) > 2:
