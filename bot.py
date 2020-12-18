@@ -180,7 +180,7 @@ class Bot(object):
             out = out[2:]
         return out
 
-    def sample_model(self, context, header):
+    def sample_model(self, context, header=None):
         # talks to the NN to get a reply
 
         # these are the config options to sample the model
